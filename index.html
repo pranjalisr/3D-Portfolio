@@ -114,7 +114,24 @@ section { padding:7rem 4rem;position:relative; }
 .exp-points em { color:var(--text);font-style:normal;font-weight:600; }
 
 /* PROJECTS */
-.proj-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:1.5rem; }
+/* project filter tabs */
+.proj-filters { display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:2.5rem; }
+.proj-filter-btn {
+  font-family:'Times New Roman',Times,serif;
+  font-size:12px;font-weight:600;letter-spacing:.04em;
+  padding:.55rem 1.3rem;border-radius:6px;border:none;
+  background:rgba(59,139,255,.1);color:var(--muted);
+  cursor:pointer;transition:all .22s ease;
+}
+.proj-filter-btn:hover { background:rgba(59,139,255,.2);color:var(--text); }
+.proj-filter-btn.active {
+  background:linear-gradient(135deg,#3b8bff,#818cf8);
+  color:#fff;box-shadow:0 4px 18px rgba(59,139,255,.35);
+}
+/* cards grid */
+.proj-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.4rem; }
+.proj-card-wrap { display:contents; }
+.proj-card-wrap.hidden { display:none; }
 .proj-card { background:var(--glass);border:0.5px solid var(--glass-b);border-radius:4px;padding:1.8rem;position:relative;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;cursor:none; }
 .proj-card::after { content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top,rgba(59,139,255,.07),transparent 60%);opacity:0;transition:opacity .4s;pointer-events:none; }
 .proj-card:hover { transform:translateY(-5px);box-shadow:0 14px 40px rgba(59,139,255,.12);border-color:rgba(59,139,255,.4); }
@@ -287,6 +304,7 @@ footer { padding:1.8rem 4rem;border-top:0.5px solid rgba(255,255,255,.05);displa
 <section id="projects">
   <div class="orb orb-indigo" style="width:450px;height:450px;bottom:0;left:3%;"></div>
   <div class="section-header reveal"><span class="section-num">02</span><h2 class="section-title">Projects</h2><div class="section-line"></div></div>
+  <div class="proj-filters" id="proj-filters"></div>
   <div class="proj-grid" id="proj-grid"></div>
 </section>
 <section id="skills">
@@ -315,20 +333,7 @@ footer { padding:1.8rem 4rem;border-top:0.5px solid rgba(255,255,255,.05);displa
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>View Full Screen
         </a>
       </div>
-      <!--
-      <div class="resume-how-to">
-       Optional instructions for forkers to update the resume PDF 
-        <div class="resume-how-to-title">How to update the resume (for forkers)</div>
-        <ol>
-          <li>Open this file in any text editor</li>
-          <li>Find <code>RESUME_BASE64</code> in the CONFIG section</li>
-          <li>Mac/Linux: <code>base64 -i your_resume.pdf | tr -d '\n'</code></li>
-          <li>Windows PS: <code>[Convert]::ToBase64String([IO.File]::ReadAllBytes("resume.pdf"))</code></li>
-          <li>Paste the output as the new value of <code>RESUME_BASE64</code> and redeploy</li>
-        </ol>
-      </div>
     </div>
-    -->
   </div>
 </section>
 <section id="contact">
@@ -378,7 +383,7 @@ const CONFIG = {
   ],
 
   /* ── Hero paragraph ─────────────────────────────── */
-  heroTagline: "Building AI-Driven Systems & Agentic Workflows  · Hands-on in GenAI, RAG, Prompt Engineering & production full-stack AI apps · Cisco intern · Mozilla & Chromium & Webpack OSS contributor.",
+  heroTagline: "Hands-on in GenAI, RAG, Prompt Engineering & production full-stack AI apps · Cisco intern · Mozilla & Chromium & Webpack OSS contributor · Ranked #10 globally at Walmart CodeHers 2024 · Top 5% SIH 2024.",
 
   /* ── Floating keyword labels (right side of hero) ── */
   heroLabels: [
@@ -393,7 +398,7 @@ const CONFIG = {
   /* ── Hero stats ─────────────────────────────────── */
   heroStats: [
     { num: "50+",    label: "AI Generations / mo" },
-    { num: "#10",     label: "Walmart CodeHers"     },
+    { num: "#10",    label: "Walmart CodeHers"    },
     { num: "Top 5%", label: "SIH 2024"             },
   ],
 
@@ -462,61 +467,271 @@ const CONFIG = {
   ],
 
   /* ── Projects ───────────────────────────────────── */
-  projects: [
+  /*
+   * PROJECTS — organised by category.
+   * Each category has a label and an array of project cards.
+   * To add a project: copy any card object, fill in the fields, paste inside the right category's `items` array.
+   * To add a new category: copy an entire category block and paste it after the last one.
+   *
+   * Fields per card:
+   *   icon   — emoji
+   *   type   — short badge text shown on the card  e.g. "ML · Classification"
+   *   title  — project name
+   *   metric — optional accuracy / score badge (set "" to hide)
+   *   desc   — 2–3 sentence description
+   *   tags   — tech stack array
+   *   github — full GitHub URL (replace "#" with your repo link)
+   */
+  projectCategories: [
+
+    // ──────────────────────────────────────────────────────────────
+    //  AI  (Artificial Intelligence, LLM, GenAI, RAG, Agents)
+    // ──────────────────────────────────────────────────────────────
     {
-      icon:   "🧠",
-      type:   "AI · Recommendation",
-      title:  "Smart Competency Diagnostic",
-      metric: "85% Accuracy",
-      desc:   "AI-driven recommendation system using 50+ data points to analyze job seekers' profiles and deliver personalized job matches. Adaptive learning pathways with 30+ micro-courses, 20+ live webinars & 15+ hands-on projects. SIH 2024 — Top 5% finalist among 20,000+ participants.",
-      tags:   ["Next.js", "MySQL", "PHP", "Bootstrap", "AI/ML"],
-      github: "https://github.com/pranjalisr/SIH1628Project/tree/master",
+      category: "AI",
+      items: [
+        {
+          icon:   "🧠",
+          type:   "AI · Recommendation",
+          title:  "Smart Competency Diagnostic",
+          metric: "85% Accuracy",
+          desc:   "AI-driven recommendation system using 50+ data points to analyze job seekers' profiles and deliver personalized job matches. Adaptive learning pathways with 30+ micro-courses, 20+ live webinars & 15+ hands-on projects. SIH 2024 — Top 5% finalist among 20,000+ participants.",
+          tags:   ["Next.js", "MySQL", "PHP", "Bootstrap", "AI/ML"],
+          github: "https://github.com/pranjalisr/SIH1628Project/tree/master",
+        },
+        {
+          icon:   "🖼️",
+          type:   "GenAI · SaaS",
+          title:  "Text-to-Image AI SaaS App",
+          metric: "99.2% Uptime",
+          desc:   "Full-stack AI SaaS leveraging the AI SDK and Stripe integration, processing 5,000+ image generations monthly with 99.2% uptime. Serverless architecture, payment processing, real-time analytics dashboard tracking user activity across 200+ records — decision efficiency improved by ~40%.",
+          tags:   ["React", "AI SDK", "Stripe", "NoSQL", "Tailwind CSS v4"],
+          github: "https://github.com/pranjalisr/Text-to-image-AI-Saas-App",
+        },
+        {
+          icon:   "⚡",
+          type:   "Backend · API",
+          title:  "FastAPI Scalable Backend App",
+          metric: "120ms Avg Response",
+          desc:   "Production-ready backend application built with FastAPI, delivering high-performance REST APIs with async request handling and clean modular architecture. Integrated authentication, automated Swagger docs, database operations, and optimized endpoints achieving ~120ms average response time with scalable deployment-ready design.",
+          tags:   ["Python", "FastAPI", "REST API", "SQL", "Swagger"],
+          github: "https://github.com/pranjalisr/fastapi",
+        },
+        {
+         icon:   "💬",
+         type:   "GenAI · Full Stack",
+         title:  "AI Chat Application",
+         metric: "1.8s Avg Response",
+         desc:   "Modern AI-powered chat platform built with full-stack architecture, enabling real-time conversational interactions with low-latency responses. Integrated authentication, scalable backend APIs, responsive UI, and optimized message streaming delivering ~1.8s average response time with seamless multi-device user experience.",
+         tags:   ["React", "Node.js", "AI API", "Tailwind CSS", "MongoDB"],
+         github: "https://github.com/pranjalisr/ai-chat-app",
+        },
+        {
+         icon:   "🧠",
+         type:   "GenAI · Agentic AI",
+         title:  "LangGraph Multi-Agent Workflow App",
+         metric: "65% Faster Task Flow",
+         desc:   "Built intelligent agentic workflows using LangGraph for multi-step reasoning, stateful execution, and tool orchestration. Designed graph-based AI pipelines with memory persistence, branching logic, and API integrations, reducing manual workflow steps by ~65% while improving automation reliability.",
+         tags:   ["Python", "LangGraph", "LLMs", "AI Agents", "Workflow Automation"],
+         github: "https://github.com/pranjalisr/Langraph",
+        },
+       {
+         icon:   "📚",
+         type:   "GenAI · RAG System",
+         title:  "Scalable Retrieval-Augmented Generation App",
+         metric: "78% Faster Retrieval",
+         desc:   "Built a scalable RAG pipeline enabling context-aware AI responses through semantic search, vector embeddings, and efficient document retrieval. Integrated chunking, embedding storage, and LLM response orchestration, improving retrieval speed by ~78% while increasing answer relevance for multi-document queries.",
+         tags:   ["Python", "RAG", "Vector DB", "LLMs", "FastAPI"],
+         github: "https://github.com/pranjalisr/Scalable-RAG",
+       },
+
+      ],
     },
+
+    // ──────────────────────────────────────────────────────────────
+    //  ML  (Machine Learning, Deep Learning, Computer Vision)
+    // ──────────────────────────────────────────────────────────────
     {
-      icon:   "🖼️",
-      type:   "GenAI · SaaS",
-      title:  "Text-to-Image AI SaaS App",
-      metric: "99.2% Uptime",
-      desc:   "Full-stack AI SaaS leveraging the AI SDK and Stripe integration, processing 5,000+ image generations monthly with 99.2% uptime. Serverless architecture, payment processing, real-time analytics dashboard tracking user activity across 200+ records — decision efficiency improved by ~40%.",
-      tags:   ["React", "AI SDK", "Stripe", "NoSQL", "Tailwind CSS v4"],
-      github: "https://github.com/pranjalisr/Text-to-image-AI-Saas-App",
+      category: "ML",
+      items: [
+        {
+          icon:   "🚜",
+          type:   "ML · Regression",
+          title:  "Bulldozer Price Prediction",
+          metric: "~90% R² Score",
+          desc:   "End-to-end regression ML pipeline achieving ~90% R² score, improving price prediction accuracy by ~30% via advanced feature engineering and temporal data preprocessing. Optimized model performance by ~25% using hyperparameter tuning and cross-validation; handled missing data and categorical encoding at scale.",
+          tags:   ["Python3", "Pandas", "Scikit-learn", "Random Forest", "NumPy"],
+          github: "https://github.com/pranjalisr/BulldozerPricePrediction",
+        },
+        {
+          icon:   "❤️",
+          type:   "ML · Classification",
+          title:  "Heart Disease Prediction",
+          metric: "88–90% Accuracy",
+          desc:   "Classification model with ~88–90% accuracy, reducing false negatives by ~20%, enabling more reliable early disease detection. Designed complete ML workflow including EDA, feature selection, and model evaluation, improving model interpretability and precision by ~18%.",
+          tags:   ["Python3", "Scikit-learn", "Logistic Regression", "Decision Trees", "Pandas", "Seaborn"],
+          github: "https://github.com/pranjalisr/HeartDiseasePrediction",
+        },
+        {
+          icon:   "🐶",
+          type:   "Deep Learning · CV",
+          title:  "Dog Vision — CNN Image Classifier",
+          metric: "90%+ Val Accuracy",
+          desc:   "Deep learning CNN model achieving 90%+ validation accuracy on multi-class dog breed dataset using transfer learning. Implemented efficient data pipelines and batch processing, reducing training time by ~20%. Improved model generalization by ~25% using data augmentation and fine-tuning pretrained architectures.",
+          tags:   ["TensorFlow", "Keras", "CNN", "OpenCV", "Transfer Learning", "Google Colab GPU"],
+          github: "https://github.com/pranjalisr/Dog-vision",
+        },
+      ],
     },
+
+    // ──────────────────────────────────────────────────────────────
+    //  DevOps  (Docker, Kubernetes, CI/CD, Cloud, Infrastructure)
+    // ──────────────────────────────────────────────────────────────
     {
-      icon:   "🛒",
-      type:   "Full-Stack · TypeScript",
-      title:  "E-Commerce + Admin Dashboard",
-      metric: "",
-      desc:   "Full-stack ecommerce platform using Next.js 14 and TypeScript, implementing 15+ responsive pages — product catalog, shopping cart, and admin dashboard with 100% mobile compatibility. Real-time data visualization tracking 8+ KPIs and managing 500+ customer records with advanced filtering.",
-      tags:   ["TypeScript", "Next.js 14", "Tailwind", "ShadCN"],
-      github: "https://github.com/pranjalisr/ecommerce-store",
+      category: "DevOps",
+      items: [
+        {
+        icon:   "🐳",
+        type:   "DevOps · Containerized App",
+        title:  "Docker Number Guessing Game",
+        metric: "95% Faster Deployment",
+        desc:   "Built and containerized an interactive number guessing game using Docker for consistent cross-environment deployment and simplified setup. Implemented lightweight image optimization, seamless local execution, and portable runtime architecture, reducing environment setup time by ~95% for developers and testers.",
+        tags:   ["Docker", "JavaScript", "HTML", "CSS", "Containerization"],
+        github: "https://github.com/pranjalisr/Docker-Number-Guessing-Game",
+        },
+        {
+        icon:   "☸️",
+        type:   "DevOps · Kubernetes Monitoring",
+        title:  "Advanced Kubernetes Cluster Monitoring",
+        metric: "99.5% Cluster Visibility",
+        desc:   "Built an advanced Kubernetes monitoring stack for real-time cluster health, workload performance, and infrastructure observability. Implemented metrics collection, log aggregation, alerting pipelines, and interactive dashboards for pods, nodes, and services, improving incident detection speed by ~65% with 99.5% monitoring visibility. :contentReference[oaicite:0]{index=0}",
+        tags:   ["Kubernetes", "Prometheus", "Grafana", "Docker", "DevOps"],
+        github: "https://github.com/pranjalisr/k8s-cluster-advanced-monitoring",
+        },
+        {
+        icon:   "🚀",
+        type:   "DevOps · Serverless CI/CD",
+        title:  "Serverless CI/CD Deployment App",
+        metric: "90% Faster Releases",
+        desc:   "Built an automated serverless CI/CD pipeline for seamless build, test, and deployment workflows using cloud-native architecture. Integrated continuous integration, zero-server maintenance deployments, and scalable release automation, reducing deployment time by ~90% while improving delivery reliability and developer productivity.",
+        tags:   ["AWS", "CI/CD", "Serverless", "GitHub Actions", "DevOps"],
+        github: "https://github.com/pranjalisr/Serverless-CICD-Appn",
+       },
+       {
+       icon:   "🔄",
+       type:   "DevOps · CI/CD Simulator",
+       title:  "CI/CD Pipeline Simulator",
+       metric: "85% Faster Testing Cycles",
+       desc:   "Built an interactive CI/CD pipeline simulator to model automated build, test, and deployment workflows in a real-world DevOps environment. Implemented pipeline stages, job execution logic, failure handling, and deployment tracking, improving release process understanding and testing efficiency by ~85%.",
+       tags:   ["React", "Next.js", "TypeScript", "CI/CD", "DevOps"],
+       github: "https://github.com/pranjalisr/CICD-pipeline-simulator",
+      },
+      {
+      icon:   "🐳",
+      type:   "DevOps · Kubernetes Game",
+      title:  "Kubernetes Docker Game Deployment",
+      metric: "92% Faster Setup",
+      desc:   "Built and deployed an interactive game application using Docker containers orchestrated on Kubernetes for scalable and reliable execution. Implemented containerized services, automated scaling, service exposure, and cluster-based deployment workflows, reducing environment setup time by ~92% while improving deployment consistency.",
+      tags:   ["Kubernetes", "Docker", "DevOps", "Node.js", "Container Orchestration"],
+      github: "https://github.com/pranjalisr/K8-dockerGame",
     },
+    
+      ],
+    },
+
+    // ──────────────────────────────────────────────────────────────
+    //  MERN Stack  (MongoDB, Express, React, Node.js)
+    // ──────────────────────────────────────────────────────────────
     {
-      icon:   "🚜",
-      type:   "ML · Regression",
-      title:  "Bulldozer Price Prediction",
-      metric: "~90% R² Score",
-      desc:   "End-to-end regression ML pipeline achieving ~90% R² score, improving price prediction accuracy by ~30% via advanced feature engineering and temporal data preprocessing. Optimized model performance by ~25% using hyperparameter tuning and cross-validation; handled missing data and categorical encoding at scale.",
-      tags:   ["Python3", "Pandas", "Scikit-learn", "Random Forest", "NumPy"],
-      github: "https://github.com/pranjalisr/BulldozerPricePrediction",
+      category: "MERN Stack",
+      items: [
+        {
+       icon:   "✅",
+       type:   "Full Stack · Productivity App",
+       title:  "Task Manager Workflow Platform",
+       metric: "50% Higher Productivity",
+       desc:   "Built a responsive task management platform for creating, organizing, prioritizing, and tracking daily workflows through an intuitive dashboard. Implemented authentication, task status pipelines, deadline management, and clean UI interactions, improving productivity and task completion efficiency by ~50%.",
+       tags:   ["Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL", "Dashboard"],
+       github: "https://github.com/pranjalisr/Task-Manager",
+       },
+       {
+       icon:   "🎵",
+       type:   "Full Stack · MERN App",
+       title:  "Music Recommendation Platform",
+       metric: "70% Higher Engagement",
+       desc:   "Built a full-stack MERN music recommendation platform enabling users to discover, save, and stream personalized song suggestions through an interactive dashboard. Implemented secure authentication, dynamic playlists, recommendation logic, and responsive UI, increasing user engagement and content discovery efficiency by ~70%.",
+       tags:   ["MongoDB", "Express.js", "React", "Node.js", "JWT"],
+       github: "https://github.com/pranjalisr/Music-recommendation-system",
+       },
+       {
+       icon:   "📈",
+       type:   "Full Stack · Next.js App",
+       title:  "Vertical Scaling Web Platform",
+       metric: "3x Higher Capacity",
+       desc:   "Built a modern Next.js web platform demonstrating vertical scaling concepts through optimized architecture and performance-focused development. Implemented server-side rendering, responsive UI, efficient data handling, and scalable deployment workflows, supporting 3x higher workload capacity with faster page performance.",
+       tags:   ["Next.js", "React", "TypeScript", "Tailwind CSS", "Vercel"],
+       github: "https://github.com/pranjalisr/Vertical-Scaling",
+       },
+       {
+       icon:   "🌍",
+       type:   "Full Stack · MERN App",
+       title:  "Multilingual FAQ Management Platform",
+       metric: "75% Faster Support Access",
+       desc:   "Built a full-stack MERN FAQ platform enabling users to browse, manage, and search multilingual help content through a responsive interface. Implemented secure admin controls, category-based organization, language switching, and real-time content updates, improving customer support accessibility and response efficiency by ~75%.",
+       tags:   ["MongoDB", "Express.js", "React", "Node.js", "JWT"],
+       github: "https://github.com/pranjalisr/multilingual-faq-js",
+},
+
+      ],
     },
+
+    // ──────────────────────────────────────────────────────────────
+    //  TypeScript  (Next.js, typed APIs, full-stack TS apps)
+    // ──────────────────────────────────────────────────────────────
     {
-      icon:   "❤️",
-      type:   "ML · Classification",
-      title:  "Heart Disease Prediction",
-      metric: "88–90% Accuracy",
-      desc:   "Classification model with ~88–90% accuracy, reducing false negatives by ~20%, enabling more reliable early disease detection. Designed complete ML workflow including EDA, feature selection, and model evaluation, improving model interpretability and precision by ~18%.",
-      tags:   ["Python3", "Scikit-learn", "Logistic Regression", "Decision Trees", "Pandas", "Seaborn"],
-      github: "https://github.com/pranjalisr/HeartDiseasePrediction",
+      category: "TypeScript",
+      items: [
+        {
+          icon:   "🛒",
+          type:   "Full-Stack · TypeScript",
+          title:  "E-Commerce + Admin Dashboard",
+          metric: "",
+          desc:   "Full-stack ecommerce platform using Next.js 14 and TypeScript, implementing 15+ responsive pages — product catalog, shopping cart, and admin dashboard with 100% mobile compatibility. Real-time data visualization tracking 8+ KPIs and managing 500+ customer records with advanced filtering.",
+          tags:   ["TypeScript", "Next.js 14", "Tailwind", "ShadCN"],
+          github: "https://github.com/pranjalisr/ecommerce-store",
+        },
+        {
+         icon:   "💼",
+         type:   "Full Stack · Productivity SaaS",
+         title:  "Job Application Tracker Platform",
+         metric: "45% Faster Tracking",
+         desc:   "Built a modern job tracking platform to manage applications, interview stages, deadlines, and progress through an intuitive dashboard. Implemented responsive full-stack architecture with real-time status management, analytics insights, and streamlined workflows improving job search organization efficiency by ~45%.",
+         tags:   ["Next.js", "TypeScript", "React", "Tailwind CSS", "Dashboard"],
+         github: "https://github.com/pranjalisr/job-tracker",
+        },
+
+        {
+         icon:   "🐞",
+         type:   "Full Stack · Productivity App",
+         title:  "Issue Tracker Management System",
+         metric: "60% Faster Resolution",
+         desc:   "Developed a full-stack issue tracking platform for reporting, assigning, prioritizing, and resolving bugs through a centralized dashboard. Implemented role-based workflows, status pipelines, and real-time updates, reducing issue resolution turnaround by ~60% while improving team collaboration efficiency.",
+         tags:   ["React", "Node.js", "MongoDB", "Express.js", "JWT"],
+         github: "https://github.com/pranjalisr/issue-tracker",
+        }, 
+        {
+        icon:   "📊",
+        type:   "Data Analytics · Dashboard",
+        title:  "Interactive Analytics Dashboard",
+        metric: "40% Faster Insights",
+        desc:   "Built a responsive analytics dashboard for monitoring KPIs, trends, and business performance through interactive charts and real-time data visualization. Implemented clean UI, dynamic filtering, and actionable reporting workflows that improved decision-making speed by ~40%.",
+        tags:   ["React", "Dashboard", "Charts.js", "Tailwind CSS", "Analytics"],
+        github: "https://github.com/pranjalisr/analytics-dashboard",
+       },
+        
+      ],
     },
-    {
-      icon:   "🐶",
-      type:   "Deep Learning · CV",
-      title:  "Dog Vision — CNN Image Classifier",
-      metric: "90%+ Val Accuracy",
-      desc:   "Deep learning CNN model achieving 90%+ validation accuracy on multi-class dog breed dataset using transfer learning. Implemented efficient data pipelines and batch processing, reducing training time by ~20%. Improved model generalization by ~25% using data augmentation and fine-tuning pretrained architectures.",
-      tags:   ["TensorFlow", "Keras", "CNN", "OpenCV", "Transfer Learning", "Google Colab GPU"],
-      github: "https://github.com/pranjalisr/Dog-vision",
-    },
+
   ],
 
   /* ── Skills ─────────────────────────────────────── */
@@ -609,14 +824,14 @@ const CONFIG = {
     "<em>#10 Walmart CodeHers 2024</em> · Top 5% Smart India Hackathon 2024",
     "CNN / Transfer Learning · PyTorch · TensorFlow · Scikit-learn · OpenCV",
     "600+ DSA problems · 10+ elite competitions · 100+ GSSoC commits",
-    "Production AI SaaS — 5,000+ image generations / month · 99.2% uptime",
+    "Production AI SaaS — 50+ image generations / month · 99.2% uptime",
   ],
   resumeRole:   "AI/ML Engineer · Full-Stack Developer",
-  resumeDegree: "Bachelor of Technology — GGV, Bilaspur",
+  resumeDegree: "B.Tech Computer Science — GGV, Bilaspur",
 
   /* ── Contact ────────────────────────────────────── */
   contactHeadingSpan: "AI systems",
-  contactSub: "Seeking AI/ML engineering roles, research internships, and open-source collaborations.<br>Based in India — open to remote &amp; relocation.",
+  contactSub: "Seeking AI/ML engineering roles, research internships, and open-source collaborations.<br>Based in Bilaspur, Chhattisgarh — open to remote &amp; relocation.",
   contactLinks: [
     { icon: "email",    label: "pranjalisr25@gmail.com",  href: "mailto:pranjalisr25@gmail.com"       },
     { icon: "linkedin", label: "linkedin/pranjali-sr25",  href: "https://linkedin.com/in/pranjali-sr25" },
@@ -684,10 +899,44 @@ const CONFIG = {
       </div>`;
   });
 
-  // Projects
-  const projGrid = document.getElementById('proj-grid');
-  CONFIG.projects.forEach(p => {
-    projGrid.innerHTML += `
+  // Projects — filter tabs
+  const projGrid    = document.getElementById('proj-grid');
+  const projFilters = document.getElementById('proj-filters');
+
+  // Build flat list of all cards tagged with category
+  const allProjects = [];
+  CONFIG.projectCategories.forEach(cat => {
+    if (cat.items.length === 0) return; // skip empty categories from card pool
+    cat.items.forEach(p => allProjects.push({ ...p, category: cat.category }));
+  });
+
+  // Also collect categories that have items (for tab buttons)
+  const filledCats = CONFIG.projectCategories.filter(c => c.items.length > 0).map(c => c.category);
+
+  // Render filter buttons: All + one per non-empty category
+  const tabs = ['All', ...filledCats];
+  tabs.forEach((tab, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'proj-filter-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = tab;
+    btn.dataset.filter = tab;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.proj-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      document.querySelectorAll('.proj-card-wrap').forEach(w => {
+        w.classList.toggle('hidden', f !== 'All' && w.dataset.category !== f);
+      });
+    });
+    projFilters.appendChild(btn);
+  });
+
+  // Render all cards (wrapped in a toggleable div)
+  allProjects.forEach(p => {
+    const wrap = document.createElement('div');
+    wrap.className = 'proj-card-wrap';
+    wrap.dataset.category = p.category;
+    wrap.innerHTML = `
       <div class="proj-card reveal">
         ${p.metric ? `<div class="proj-metric">${p.metric}</div>` : ''}
         <div class="proj-top"><div class="proj-icon">${p.icon}</div><span class="proj-type">${p.type}</span></div>
@@ -698,6 +947,7 @@ const CONFIG = {
           <a href="${p.github}" class="proj-link" target="_blank" rel="noopener">GitHub ↗</a>
         </div>
       </div>`;
+    projGrid.appendChild(wrap);
   });
 
   // Skills
@@ -749,7 +999,7 @@ const CONFIG = {
 
   // Footer
   document.getElementById('footer-left').innerHTML =
-    `© 2026 <span class="footer-blue">${CONFIG.footerName}</span> — ${CONFIG.footerRole}`;
+    `© 2025 <span class="footer-blue">${CONFIG.footerName}</span> — ${CONFIG.footerRole}`;
 
 })();
 
