@@ -41,75 +41,75 @@
 
 * Step 4 — Replace the resume PDF
   
-  Convert your PDF to a base64 string and paste it as RESUME_BASE64.
+  - Convert your PDF to a base64 string and paste it as RESUME_BASE64.
  
-  Mac / Linux:
- 
-  bashbase64 -i your_resume.pdf | tr -d '\n'
+  - Mac / Linux
+  
+  - bashbase64 -i your_resume.pdf | tr -d '\n'
  
   Windows (PowerShell):
  
-  powershell[Convert]::ToBase64String([IO.File]::ReadAllBytes("your_resume.pdf"))
+  - powershell[Convert]::ToBase64String([IO.File]::ReadAllBytes("your_resume.pdf"))
   
-  Copy the entire output string and replace the existing value of RESUME_BASE64 in the CONFIG.
+  - Copy the entire output string and replace the existing value of RESUME_BASE64 in the CONFIG.
 
 *  Step 5 — Preview locally
   
-   Just open the file in your browser:
+   - Just open the file in your browser:
  
-   bashopen index.html        # Mac
+   - bashopen index.html        # Mac
  
-   start index.html       # Windows
+   - start index.html       # Windows
  
-   xdg-open index.html    # Linux
+   - xdg-open index.html    # Linux
  
-   Or use VS Code's Live Server extension for auto-refresh on save.
+   - Or use VS Code's Live Server extension for auto-refresh on save.
 
-* Deploy to Netlify (free, public URL, 1 minute)
+## Deploy to Netlify (free, public URL, 1 minute)
   
 * Option A — Drag & Drop (no CLI needed)
 
-  Go to netlify.com and sign up (free)
+  - Go to netlify.com and sign up (free)
 
-  Create a folder called portfolio/ and put index.html inside it
+  - Create a folder called portfolio/ and put index.html inside it
  
-  On the Netlify dashboard → Add new site → Deploy manually
+  - On the Netlify dashboard → Add new site → Deploy manually
  
-  Drag and drop the portfolio/ folder onto the page
+  - Drag and drop the portfolio/ folder onto the page
  
-  Your site is live at https://random-name.netlify.app
+  - Your site is live at https://random-name.netlify.app
  
-  Rename it under Site Settings → Site name
+  - Rename it under Site Settings → Site name
 
 * Option B — GitHub + Auto-deploy
 
-  Push this repo to GitHub
+  - Push this repo to GitHub
  
-  Netlify → Add new site → Import from Git → select your repo
+  - Netlify → Add new site → Import from Git → select your repo
  
-  Build command: (leave blank)
+  - Build command: (leave blank)
  
-  Publish directory: .
+  - Publish directory: .
  
-  Every git push automatically redeploys your live site
+  - Every git push automatically redeploys your live site
 
 
-* Customisation Tips
+## Customisation Tips
   
   Adding a new project card:
  
-  Find projects: in the CONFIG array and add a new object following the same structure. The page renders it automatically.
+ - Find projects: in the CONFIG array and add a new object following the same structure. The page renders it automatically.
  
   Adding a new experience entry:
  
-  Find experience: in the CONFIG array and add a new object. Order in the array = order on the page.
+  - Find experience: in the CONFIG array and add a new object. Order in the array = order on the page.
  
   Changing the typing phrases:
  
-  Edit the typingPhrases array. Add as many strings as you want — the animation cycles through all of them.
+  - Edit the typingPhrases array. Add as many strings as you want — the animation cycles through all of them.
  
   
 
-* License
+## License
   
 MIT — free to fork, personalise, and deploy. Attribution appreciated but not required.
